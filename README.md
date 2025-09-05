@@ -8,25 +8,27 @@ This application provides a streamlined way to track investment performance by m
 
 ## 🧱 Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| **Frontend** | Next.js (App Router) + React |
-| **UI/Styling** | TailwindCSS + ShadCN UI |
-| **State Management** | React Hooks (local state) |
-| **Database** | PostgreSQL via Docker |
-| **ORM** | Prisma |
-| **Charts** | Recharts |
-| **Language** | TypeScript |
+| Layer                | Technology                   |
+| -------------------- | ---------------------------- |
+| **Frontend**         | Next.js (App Router) + React |
+| **UI/Styling**       | TailwindCSS + ShadCN UI      |
+| **State Management** | React Hooks (local state)    |
+| **Database**         | PostgreSQL via Docker        |
+| **ORM**              | Prisma                       |
+| **Charts**           | Recharts                     |
+| **Language**         | TypeScript                   |
 
 ## ✅ Features
 
 ### Core Features
+
 - **📁 Portfolio Creation**: Create and manage multiple investment portfolios
 - **📝 Trade Registration**: Record buy/sell operations with detailed information
 - **📊 Trade Dashboard**: View and manage all trades with filtering capabilities
 - **📈 PnL Visualization**: Interactive charts showing accumulated profit/loss over time
 
 ### Additional Features
+
 - **🔧 Edit/Delete Trades**: Modify or remove existing trade records
 - **📱 Responsive Design**: Optimized for desktop, tablet, and mobile devices
 - **🎨 Modern UI**: Clean interface using ShadCN UI components
@@ -35,36 +37,42 @@ This application provides a streamlined way to track investment performance by m
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - Docker (for PostgreSQL)
 - npm or yarn
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd financial-portfolio-tracker
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up the database**
+
    ```bash
    # Start PostgreSQL container
    docker run --name portfolio-db -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
    ```
 
 4. **Configure environment variables**
+
    ```bash
    cp .env.example .env
    # Edit .env with your database connection string
    ```
 
 5. **Set up Prisma**
+
    ```bash
    npx prisma generate
    npx prisma db push
@@ -98,12 +106,14 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 ## 🗃️ Database Schema
 
 ### Portfolio Model
+
 - `id`: Unique identifier
 - `name`: Portfolio name
 - `initialValue`: Starting investment amount
 - `createdAt`, `updatedAt`: Timestamps
 
 ### Trade Model
+
 - `id`: Unique identifier
 - `ticker`: Stock/asset symbol
 - `entryPrice`: Purchase price
@@ -115,6 +125,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 ## 📊 PnL Calculation
 
 The application calculates profit/loss using the formula:
+
 ```
 PnL = (exitPrice - entryPrice) × quantity
 ```
@@ -123,18 +134,19 @@ Accumulated PnL is calculated by summing all trade PnLs ordered by execution dat
 
 ## 🛠️ Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Build production application |
-| `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
-| `npm run format` | Format code with Prettier |
+| Command              | Description                  |
+| -------------------- | ---------------------------- |
+| `npm run dev`        | Start development server     |
+| `npm run build`      | Build production application |
+| `npm run start`      | Start production server      |
+| `npm run lint`       | Run ESLint                   |
+| `npm run format`     | Format code with Prettier    |
 | `npm run type-check` | Run TypeScript type checking |
 
 ## 🎨 UI Components
 
 This project uses [ShadCN UI](https://ui.shadcn.com/) components for a consistent and modern interface:
+
 - Forms and inputs for data entry
 - Tables for trade listings
 - Cards for portfolio display
@@ -144,12 +156,14 @@ This project uses [ShadCN UI](https://ui.shadcn.com/) components for a consisten
 ## 🔧 Development
 
 ### Code Quality
+
 - **ESLint**: Code linting and style enforcement
 - **Prettier**: Automatic code formatting
 - **TypeScript**: Type safety and better developer experience
 - **Functional Programming**: Uses functional paradigm without classes
 
 ### Database Management
+
 ```bash
 # Reset database
 npx prisma db push --force-reset
@@ -164,6 +178,7 @@ npx prisma generate
 ## 🚀 Deployment
 
 The application can be deployed on any platform that supports Next.js:
+
 - **Vercel** (recommended)
 - **Netlify**
 - **Railway**
