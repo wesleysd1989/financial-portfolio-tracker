@@ -26,6 +26,7 @@ async function main() {
         quantity: 10,
         date: new Date(),
         portfolioId: portfolio.id,
+        pnl: (160.0 - 150.0) * 10, // Calculate PnL
       },
     });
     console.log('✅ Trade created:', trade);

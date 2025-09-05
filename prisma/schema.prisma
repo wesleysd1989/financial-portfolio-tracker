@@ -30,6 +30,7 @@ model Trade {
   exitPrice   Float
   quantity    Int
   date        DateTime
+  pnl         Float // Profit and Loss calculation: (exitPrice - entryPrice) * quantity
   portfolio   Portfolio @relation(fields: [portfolioId], references: [id])
   portfolioId Int
   createdAt   DateTime  @default(now())

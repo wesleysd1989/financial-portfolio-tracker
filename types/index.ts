@@ -16,6 +16,7 @@ export interface Trade {
   quantity: number;
   date: Date;
   portfolioId: number;
+  pnl?: number; // Profit and Loss calculation
   createdAt: Date;
   updatedAt: Date;
   portfolio?: Portfolio; // Relacionamento opcional

@@ -80,6 +80,7 @@ export const tradeService = {
     quantity: number;
     date: Date;
     portfolioId: number;
+    pnl: number;
   }) {
     return await prisma.trade.create({
       data,
