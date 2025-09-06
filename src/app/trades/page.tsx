@@ -306,7 +306,7 @@ export default function Trades() {
   };
 
   return (
-    <MainLayout>
+    <MainLayout className="max-w-none px-6 sm:px-8 lg:px-12">
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -492,7 +492,7 @@ export default function Trades() {
             ) : (
               <div className="space-y-4">
                 {currentTrades.map((trade) => (
-                <div key={trade?.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                <div key={trade.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     {/* Trade Info */}
                     <div className="flex items-center space-x-4">

@@ -46,9 +46,9 @@ const features = [
 
 export default function Home() {
   return (
-    <MainLayout>
+    <MainLayout className="max-w-none px-6 sm:px-8 lg:px-12">
       {/* Hero Section */}
-      <div className="text-center py-12 px-4">
+      <div className="text-center py-12">
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center">

@@ -203,7 +203,7 @@ export default function Dashboard() {
     .slice(0, 5);
 
   return (
-    <MainLayout>
+    <MainLayout className="max-w-none px-6 sm:px-8 lg:px-12">
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

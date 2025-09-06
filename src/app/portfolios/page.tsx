@@ -152,7 +152,7 @@ export default function Portfolios() {
   };
 
   return (
-    <MainLayout>
+    <MainLayout className="max-w-none px-6 sm:px-8 lg:px-12">
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
           <div>

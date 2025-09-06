@@ -6,7 +6,7 @@ import MainLayout from '@/components/layout/main-layout';
 import TradeForm from '../../../../components/trade/trade-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, TrendingUp, Info } from 'lucide-react';
+import { ArrowLeft, TrendingUp, Info, Plus } from 'lucide-react';
 import Link from 'next/link';
 
 export default function RegisterTradePage() {
@@ -57,104 +57,141 @@ export default function RegisterTradePage() {
 
   if (successMessage) {
     return (
-      <MainLayout>
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-md mx-auto">
-            <Card className="border-green-200 bg-green-50">
-              <CardHeader className="text-center">
-                <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                  <TrendingUp className="w-6 h-6 text-green-600" />
-                </div>
-                <CardTitle className="text-green-800">Trade Registered!</CardTitle>
-                <CardDescription className="text-green-600">
-                  {successMessage}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-sm text-green-600 mb-4">
-                  Redirecting to trades list...
-                </p>
-                <Button asChild variant="outline">
+      <MainLayout className="max-w-none px-6 sm:px-8 lg:px-12">
+        <div className="space-y-6">
+          {/* Success Header */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Trade Registered Successfully!</h1>
+              <p className="text-gray-600 mt-1">
+                Your trade has been added to your portfolio
+              </p>
+            </div>
+            <Link href="/trades/register">
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Register Another Trade
+              </Button>
+            </Link>
+          </div>
+
+          {/* Success Card */}
+          <Card className="border-green-200 bg-green-50">
+            <CardHeader className="text-center">
+              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                <TrendingUp className="w-8 h-8 text-green-600" />
+              </div>
+              <CardTitle className="text-green-800 text-2xl">Trade Registered!</CardTitle>
+              <CardDescription className="text-green-600 text-lg">
+                {successMessage}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center space-y-4">
+              <p className="text-sm text-green-600">
+                Redirecting to trades list in a few seconds...
+              </p>
+              <div className="flex flex-wrap gap-4 justify-center">
+                <Button asChild>
                   <Link href="/trades">View All Trades</Link>
                 </Button>
-              </CardContent>
-            </Card>
-          </div>
+                <Button variant="outline" asChild>
+                  <Link href="/dashboard">Go to Dashboard</Link>
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link href="/trades/register">Register Another Trade</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </MainLayout>
     );
   }
 
   return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-8">
+    <MainLayout className="max-w-none px-6 sm:px-8 lg:px-12">
+      <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/trades">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Trades
-              </Link>
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Register New Trade</h1>
-              <p className="text-gray-600 mt-1">
-                Add a new trade to your portfolio
-              </p>
-            </div>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Register New Trade</h1>
+            <p className="text-gray-600 mt-1">
+              Add a new trade to your portfolio and track your performance
+            </p>
           </div>
-        </div>
-
-        {/* Info Card */}
-        <div className="mb-8">
-          <Card className="border-blue-200 bg-blue-50">
-            <CardContent className="pt-6">
-              <div className="flex items-start space-x-3">
-                <Info className="w-5 h-5 text-blue-600 mt-0.5" />
-                <div className="text-sm text-blue-800">
-                  <p className="font-medium mb-1">Trade Registration Tips:</p>
-                  <ul className="space-y-1 text-blue-700">
-                    <li>• Enter the ticker symbol in uppercase (e.g., AAPL, GOOGL)</li>
-                    <li>• Entry and exit prices should reflect your actual trade prices</li>
-                    <li>• The system will automatically calculate your P&L</li>
-                    <li>• Trade date cannot be in the future</li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Trade Form */}
-        <div className="max-w-4xl mx-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
-                Trade Details
-              </CardTitle>
-              <CardDescription>
-                Fill in all the details of your trade. The P&L will be calculated automatically.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <TradeForm onSubmit={handleTradeSubmit} />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Additional Actions */}
-        <div className="max-w-4xl mx-auto mt-6 text-center">
-          <p className="text-sm text-gray-600 mb-4">
-            Need to create a portfolio first?
-          </p>
           <Button variant="outline" asChild>
-            <Link href="/portfolios">
-              Manage Portfolios
+            <Link href="/trades">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Trades
             </Link>
           </Button>
         </div>
+
+        {/* Info Card */}
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="pt-6">
+            <div className="flex items-start space-x-3">
+              <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-blue-800">
+                <p className="font-medium mb-2">Trade Registration Tips:</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-blue-700">
+                  <div>• Enter ticker symbol in uppercase (e.g., AAPL, GOOGL)</div>
+                  <div>• Entry and exit prices should reflect actual trade prices</div>
+                  <div>• The system will automatically calculate your P&L</div>
+                  <div>• Trade date cannot be in the future</div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Trade Form */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center text-xl">
+              <TrendingUp className="w-6 h-6 mr-2 text-green-600" />
+              Trade Details
+            </CardTitle>
+            <CardDescription>
+              Fill in all the details of your trade. The P&L will be calculated automatically based on your entry and exit prices.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TradeForm onSubmit={handleTradeSubmit} />
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Quick Actions</CardTitle>
+            <CardDescription>
+              Navigate to other sections of the application
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Button variant="outline" asChild className="h-auto p-4">
+                <Link href="/portfolios" className="flex flex-col items-center space-y-2">
+                  <ArrowLeft className="w-5 h-5" />
+                  <span>Manage Portfolios</span>
+                </Link>
+              </Button>
+              <Button variant="outline" asChild className="h-auto p-4">
+                <Link href="/trades" className="flex flex-col items-center space-y-2">
+                  <TrendingUp className="w-5 h-5" />
+                  <span>View All Trades</span>
+                </Link>
+              </Button>
+              <Button variant="outline" asChild className="h-auto p-4">
+                <Link href="/dashboard" className="flex flex-col items-center space-y-2">
+                  <TrendingUp className="w-5 h-5" />
+                  <span>Go to Dashboard</span>
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </MainLayout>
   );
