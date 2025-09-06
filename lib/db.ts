@@ -122,6 +122,8 @@ export const tradeService = {
       exitPrice?: number;
       quantity?: number;
       date?: Date;
+      portfolioId?: number;
+      pnl?: number;
     }
   ) {
     return await prisma.trade.update({

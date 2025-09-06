@@ -96,7 +96,7 @@ export default function PnLChart({ data, loading = false, portfolioName = 'Portf
         </p>
       </div>
       
-      <div className="w-full h-80 bg-white rounded-lg border border-gray-200 p-4">
+      <div className="w-full h-64 sm:h-80 bg-white rounded-lg border border-gray-200 p-2 sm:p-4">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart 
             data={chartData} 
@@ -143,7 +143,7 @@ export default function PnLChart({ data, loading = false, portfolioName = 'Portf
       </div>
 
       {/* Summary statistics */}
-      <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+      <div className="mt-4 grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 text-center">
         <div className="bg-gray-50 rounded-lg p-3">
           <p className="text-xs text-gray-500 uppercase tracking-wide">Total P&L</p>
           <p className={`text-lg font-semibold ${finalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>

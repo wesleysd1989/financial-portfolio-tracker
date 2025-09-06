@@ -4,13 +4,13 @@ import { prisma } from '../../../../../lib/prisma';
 // DELETE /api/portfolios/[id] - Delete a specific portfolio
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    const resolvedParams = await params;
-    const id = parseInt(resolvedParams.id);
+    const portfolioId = parseInt(id);
     
-    if (isNaN(id)) {
+    if (isNaN(portfolioId)) {
       return NextResponse.json(
         { error: 'Invalid portfolio ID' },
         { status: 400 }
@@ -19,7 +19,7 @@ export async function DELETE(
 
     // Check if portfolio exists
     const portfolio = await prisma.portfolio.findUnique({
-      where: { id },
+      where: { id: portfolioId },
     });
 
     if (!portfolio) {
@@ -31,12 +31,12 @@ export async function DELETE(
 
     // First, delete all trades associated with this portfolio
     await prisma.trade.deleteMany({
-      where: { portfolioId: id }
+      where: { portfolioId: portfolioId }
     });
 
     // Then delete the portfolio
     await prisma.portfolio.delete({
-      where: { id },
+      where: { id: portfolioId },
     });
 
     return NextResponse.json(
@@ -55,13 +55,13 @@ export async function DELETE(
 // GET /api/portfolios/[id] - Get a specific portfolio
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    const resolvedParams = await params;
-    const id = parseInt(resolvedParams.id);
+    const portfolioId = parseInt(id);
     
-    if (isNaN(id)) {
+    if (isNaN(portfolioId)) {
       return NextResponse.json(
         { error: 'Invalid portfolio ID' },
         { status: 400 }
@@ -69,7 +69,7 @@ export async function GET(
     }
 
     const portfolio = await prisma.portfolio.findUnique({
-      where: { id },
+      where: { id: portfolioId },
       include: {
         trades: true
       }

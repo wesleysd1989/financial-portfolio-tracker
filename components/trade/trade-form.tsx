@@ -38,23 +38,33 @@ interface TradeFormProps {
     date: string;
     portfolioId: number;
   }) => Promise<void>;
+  initialData?: TradeFormData;
+  isSubmitting?: boolean;
+  submitButtonText?: string;
 }
 
-export default function TradeForm({ onSubmit }: TradeFormProps) {
+export default function TradeForm({ 
+  onSubmit, 
+  initialData, 
+  isSubmitting: externalIsSubmitting = false,
+  submitButtonText = 'Register Trade'
+}: TradeFormProps) {
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [loadingPortfolios, setLoadingPortfolios] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [errors, setErrors] = useState<Partial<TradeFormData>>({});
   
-  const [formData, setFormData] = useState<TradeFormData>({
-    ticker: '',
-    entryPrice: '',
-    exitPrice: '',
-    quantity: '',
-    date: new Date().toISOString().split('T')[0],
-    portfolioId: ''
-  });
+  const [formData, setFormData] = useState<TradeFormData>(
+    initialData || {
+      ticker: '',
+      entryPrice: '',
+      exitPrice: '',
+      quantity: '',
+      date: new Date().toISOString().split('T')[0],
+      portfolioId: ''
+    }
+  );
 
   // Fetch portfolios on component mount
   useEffect(() => {
@@ -210,7 +220,7 @@ export default function TradeForm({ onSubmit }: TradeFormProps) {
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         {/* Ticker Symbol */}
         <div className="space-y-2">
           <Label htmlFor="ticker">Ticker Symbol</Label>
@@ -329,16 +339,16 @@ export default function TradeForm({ onSubmit }: TradeFormProps) {
       {/* Submit Button */}
       <Button 
         type="submit" 
-        disabled={isSubmitting || loadingPortfolios || portfolios.length === 0}
+        disabled={isSubmitting || externalIsSubmitting || loadingPortfolios || portfolios.length === 0}
         className="w-full"
       >
-        {isSubmitting ? (
+        {(isSubmitting || externalIsSubmitting) ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin mr-2" />
-            Registering Trade...
+            {submitButtonText.includes('...') ? submitButtonText : `${submitButtonText.replace('Register Trade', 'Registering Trade').replace('Update Trade', 'Updating Trade')}...`}
           </>
         ) : (
-          'Register Trade'
+          submitButtonText
         )}
       </Button>
 

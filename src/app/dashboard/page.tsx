@@ -19,6 +19,7 @@ import Link from 'next/link';
 import { Portfolio, Trade } from '../../../types/index';
 import PortfolioSelector from '../../../components/dashboard/portfolio-selector';
 import TradeList from '../../../components/dashboard/trade-list';
+import EnhancedTradeList from '../../components/trade/enhanced-trade-list';
 import PnLChart from '../../../components/charts/pnl-chart';
 import { calculateTotalPnL, calculatePortfolioPerformance, calculateCumulativePnL } from '@/utils/pnl';
 
@@ -52,6 +53,85 @@ export default function Dashboard() {
     stats: false
   });
   const [error, setError] = useState<string>('');
+
+  // Trade management functions
+  const handleEditTrade = async (id: number, data: any) => {
+    try {
+      const response = await fetch(`/api/trades/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update trade');
+      }
+
+      // Refresh trades after successful update
+      if (selectedPortfolio) {
+        const tradesResponse = await fetch(`/api/trades?portfolioId=${selectedPortfolio.id}`);
+        if (tradesResponse.ok) {
+          const updatedTrades = await tradesResponse.json();
+          setTrades(updatedTrades);
+          
+          // Recalculate stats and chart data
+          const performance = calculatePortfolioPerformance(selectedPortfolio, updatedTrades);
+          setStats({
+            totalValue: performance.currentValue,
+            totalPnL: performance.totalPnL,
+            totalTrades: performance.totalTrades,
+            returnPercentage: performance.returnPercentage
+          });
+
+          const cumulativePnLData = calculateCumulativePnL(updatedTrades);
+          setChartData(cumulativePnLData);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating trade:', error);
+      setError('Failed to update trade. Please try again.');
+      throw error; // Re-throw to let TradeActions handle the error state
+    }
+  };
+
+  const handleDeleteTrade = async (id: number) => {
+    try {
+      const response = await fetch(`/api/trades/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete trade');
+      }
+
+      // Refresh trades after successful deletion
+      if (selectedPortfolio) {
+        const tradesResponse = await fetch(`/api/trades?portfolioId=${selectedPortfolio.id}`);
+        if (tradesResponse.ok) {
+          const updatedTrades = await tradesResponse.json();
+          setTrades(updatedTrades);
+          
+          // Recalculate stats and chart data
+          const performance = calculatePortfolioPerformance(selectedPortfolio, updatedTrades);
+          setStats({
+            totalValue: performance.currentValue,
+            totalPnL: performance.totalPnL,
+            totalTrades: performance.totalTrades,
+            returnPercentage: performance.returnPercentage
+          });
+
+          const cumulativePnLData = calculateCumulativePnL(updatedTrades);
+          setChartData(cumulativePnLData);
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting trade:', error);
+      setError('Failed to delete trade. Please try again.');
+      throw error; // Re-throw to let TradeActions handle the error state
+    }
+  };
 
   // Fetch portfolios on component mount
   useEffect(() => {
@@ -208,7 +288,7 @@ export default function Dashboard() {
 
         {/* Stats Cards */}
         {selectedPortfolio && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600">
@@ -402,15 +482,17 @@ export default function Dashboard() {
 
         {/* Complete Trade List */}
         {selectedPortfolio && (
-          <TradeList
+          <EnhancedTradeList
             trades={trades}
             loading={loading.trades}
             portfolioName={selectedPortfolio.name}
+            onEditTrade={handleEditTrade}
+            onDeleteTrade={handleDeleteTrade}
           />
         )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <Card className="hover:shadow-lg transition-shadow cursor-pointer">
             <Link href="/portfolios">
               <CardHeader>
