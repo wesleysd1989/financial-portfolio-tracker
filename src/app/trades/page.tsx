@@ -145,11 +145,26 @@ export default function Trades() {
   const [currentPage, setCurrentPage] = useState(1);
   const tradesPerPage = 5;
   
-  // Calculate pagination
-  const totalPages = Math.ceil(trades.length / tradesPerPage);
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Filter trades based on search term
+  const filteredTrades = trades.filter(trade => {
+    if (!searchTerm) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      trade.ticker.toLowerCase().includes(searchLower) ||
+      trade.portfolioName.toLowerCase().includes(searchLower) ||
+      trade.type.toLowerCase().includes(searchLower)
+    );
+  });
+  
+  // Calculate pagination based on filtered trades
+  const totalPages = Math.ceil(filteredTrades.length / tradesPerPage);
   const startIndex = (currentPage - 1) * tradesPerPage;
   const endIndex = startIndex + tradesPerPage;
-  const currentTrades = trades.slice(startIndex, endIndex);
+  const currentTrades = filteredTrades.slice(startIndex, endIndex);
   
   // Pagination functions
   const goToPage = (page: number) => {
@@ -166,6 +181,12 @@ export default function Trades() {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
+  };
+  
+  // Reset to first page when search term changes
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
   };
 
   // Load trades and portfolios from API
@@ -217,9 +238,9 @@ export default function Trades() {
     loadData();
   }, []);
 
-  const totalPnL = trades.reduce((sum, trade) => sum + trade.pnl, 0);
-  const profitableTrades = trades.filter(trade => trade.pnl > 0).length;
-  const totalVolume = trades.reduce((sum, trade) => sum + (trade.entryPrice * trade.quantity), 0);
+  const totalPnL = filteredTrades.reduce((sum, trade) => sum + trade.pnl, 0);
+  const profitableTrades = filteredTrades.filter(trade => trade.pnl > 0).length;
+  const totalVolume = filteredTrades.reduce((sum, trade) => sum + (trade.entryPrice * trade.quantity), 0);
 
   const handleEditTrade = async (tradeData: any) => {
     try {
@@ -343,10 +364,10 @@ export default function Trades() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {trades.length}
+                {searchTerm ? `${filteredTrades.length}/${trades.length}` : trades.length}
               </div>
               <p className="text-xs text-gray-600 mt-1">
-                Registered trades
+                {searchTerm ? 'Filtered/Total trades' : 'Registered trades'}
               </p>
             </CardContent>
           </Card>
@@ -397,10 +418,28 @@ export default function Trades() {
                 <div className="relative">
                   <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
                   <Input 
-                    placeholder="Search by ticker..." 
+                    placeholder="Search by ticker, portfolio, or type..." 
                     className="pl-10"
+                    value={searchTerm}
+                    onChange={(e) => handleSearchChange(e.target.value)}
                   />
+                  {searchTerm && (
+                    <button
+                      onClick={() => handleSearchChange('')}
+                      className="absolute right-3 top-3 w-4 h-4 text-gray-400 hover:text-gray-600"
+                      title="Clear search"
+                    >
+                      ×
+                    </button>
+                  )}
                 </div>
+                {searchTerm && (
+                  <div className="mt-2">
+                    <Badge variant="secondary" className="text-xs">
+                      Filtering by: "{searchTerm}" ({filteredTrades.length} results)
+                    </Badge>
+                  </div>
+                )}
               </div>
               <Button variant="outline">
                 <Filter className="w-4 h-4 mr-2" />
@@ -424,15 +463,31 @@ export default function Trades() {
                 <Loader2 className="w-6 h-6 animate-spin mr-2" />
                 <span>Loading trades...</span>
               </div>
-            ) : trades.length === 0 ? (
+            ) : filteredTrades.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-gray-500 mb-4">No trades found</p>
-                <Link href="/trades/register">
-                  <Button>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Register First Trade
-                  </Button>
-                </Link>
+                {searchTerm ? (
+                  <>
+                    <p className="text-gray-500 mb-4">
+                      No trades found matching "{searchTerm}"
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleSearchChange('')}
+                    >
+                      Clear Search
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-gray-500 mb-4">No trades found</p>
+                    <Link href="/trades/register">
+                      <Button>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Register First Trade
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             ) : (
               <div className="space-y-4">
