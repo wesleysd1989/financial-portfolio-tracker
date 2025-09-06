@@ -35,6 +35,7 @@ import {
   Trash2,
   Eye
 } from 'lucide-react';
+import Link from 'next/link';
 
 interface Portfolio {
   id: number;
@@ -268,10 +269,12 @@ export default function Portfolios() {
                 </CardContent>
 
                 <CardFooter className="flex justify-between">
-                  <Button variant="outline" size="sm">
-                    <Eye className="w-4 h-4 mr-1" />
-                    View Details
-                  </Button>
+                  <Link href={`/portfolios/${portfolio.id}`}>
+                    <Button variant="outline" size="sm">
+                      <Eye className="w-4 h-4 mr-1" />
+                      View Details
+                    </Button>
+                  </Link>
                   
                   <Dialog>
                     <DialogTrigger asChild>
