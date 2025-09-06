@@ -41,6 +41,27 @@ import {
   AlertCircle
 } from 'lucide-react';
 
+// Types
+interface Portfolio {
+  id: number;
+  name: string;
+  initialValue?: number;
+}
+
+interface Trade {
+  id: number;
+  ticker: string;
+  portfolioName: string;
+  entryPrice: number;
+  exitPrice: number;
+  quantity: number;
+  date: string;
+  pnl: number;
+  returnPercentage: number;
+  type: string;
+  portfolioId: number;
+}
+
 // Mock data for demonstration
 const mockTrades = [
   {
@@ -53,7 +74,8 @@ const mockTrades = [
     date: '2024-01-15',
     pnl: 100.00,
     returnPercentage: 6.67,
-    type: 'Completed'
+    type: 'Completed',
+    portfolioId: 1
   },
   {
     id: 2,
@@ -65,7 +87,8 @@ const mockTrades = [
     date: '2024-01-14',
     pnl: 500.00,
     returnPercentage: 4.00,
-    type: 'Completed'
+    type: 'Completed',
+    portfolioId: 1
   },
   {
     id: 3,
@@ -77,7 +100,8 @@ const mockTrades = [
     date: '2024-01-13',
     pnl: -80.00,
     returnPercentage: -2.86,
-    type: 'Completed'
+    type: 'Completed',
+    portfolioId: 2
   },
   {
     id: 4,
@@ -89,7 +113,8 @@ const mockTrades = [
     date: '2024-01-12',
     pnl: 300.00,
     returnPercentage: 10.00,
-    type: 'Completed'
+    type: 'Completed',
+    portfolioId: 3
   },
   {
     id: 5,
@@ -101,30 +126,108 @@ const mockTrades = [
     date: '2024-01-11',
     pnl: -90.00,
     returnPercentage: -3.33,
-    type: 'Completed'
+    type: 'Completed',
+    portfolioId: 2
   }
 ];
 
 export default function Trades() {
-  const [trades, setTrades] = useState(mockTrades);
-  const [loading, setLoading] = useState(false);
+  const [trades, setTrades] = useState<Trade[]>([]);
+  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [editingTrade, setEditingTrade] = useState(null);
-  const [deletingTrade, setDeletingTrade] = useState(null);
+  const [editingTrade, setEditingTrade] = useState<Trade | null>(null);
+  const [deletingTrade, setDeletingTrade] = useState<Trade | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const tradesPerPage = 5;
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(trades.length / tradesPerPage);
+  const startIndex = (currentPage - 1) * tradesPerPage;
+  const endIndex = startIndex + tradesPerPage;
+  const currentTrades = trades.slice(startIndex, endIndex);
+  
+  // Pagination functions
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
+  
+  const goToPrevious = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+  
+  const goToNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // Load trades and portfolios from API
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        
+        // Load trades and portfolios in parallel
+        const [tradesResponse, portfoliosResponse] = await Promise.all([
+          fetch('/api/trades'),
+          fetch('/api/portfolios')
+        ]);
+
+        if (!tradesResponse.ok) {
+          throw new Error('Failed to load trades');
+        }
+        if (!portfoliosResponse.ok) {
+          throw new Error('Failed to load portfolios');
+        }
+
+        const tradesData = await tradesResponse.json();
+        const portfoliosData = await portfoliosResponse.json();
+        
+        // Transform trades data to include portfolio name and format for display
+        const transformedTrades = tradesData.map((trade: any) => {
+          const portfolio = portfoliosData.find((p: any) => p.id === trade.portfolioId);
+          return {
+            ...trade,
+            portfolioName: portfolio?.name || 'Unknown Portfolio',
+            returnPercentage: trade.entryPrice > 0 ? ((trade.exitPrice - trade.entryPrice) / trade.entryPrice) * 100 : 0,
+            type: 'Completed', // All trades are completed for now
+            portfolioId: trade.portfolioId // Ensure portfolioId is included
+          };
+        });
+        
+        setTrades(transformedTrades as Trade[]);
+        setPortfolios(portfoliosData);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load data');
+        // Fallback to mock data if API fails
+        setTrades(mockTrades as Trade[]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const totalPnL = trades.reduce((sum, trade) => sum + trade.pnl, 0);
   const profitableTrades = trades.filter(trade => trade.pnl > 0).length;
   const totalVolume = trades.reduce((sum, trade) => sum + (trade.entryPrice * trade.quantity), 0);
 
-  const handleEditTrade = async (tradeData) => {
+  const handleEditTrade = async (tradeData: any) => {
     try {
       setIsEditing(true);
       setError('');
       
       // Simulate API call - replace with actual API call
-      const response = await fetch(`/api/trades/${editingTrade.id}`, {
+      const response = await fetch(`/api/trades/${editingTrade?.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(tradeData),
@@ -138,7 +241,7 @@ export default function Trades() {
       
       // Update local state
       setTrades(trades.map(trade => 
-        trade.id === editingTrade.id ? { ...trade, ...updatedTrade } : trade
+        trade.id === editingTrade?.id ? { ...trade, ...updatedTrade } : trade
       ));
       
       setEditingTrade(null);
@@ -149,7 +252,7 @@ export default function Trades() {
     }
   };
 
-  const handleDeleteTrade = async (tradeId) => {
+  const handleDeleteTrade = async (tradeId: number) => {
     try {
       setIsDeleting(true);
       setError('');
@@ -164,7 +267,15 @@ export default function Trades() {
       }
 
       // Update local state
-      setTrades(trades.filter(trade => trade.id !== tradeId));
+      const updatedTrades = trades.filter(trade => trade.id !== tradeId);
+      setTrades(updatedTrades);
+      
+      // Adjust current page if we deleted the last item on the current page
+      const newTotalPages = Math.ceil(updatedTrades.length / tradesPerPage);
+      if (currentPage > newTotalPages && newTotalPages > 0) {
+        setCurrentPage(newTotalPages);
+      }
+      
       setDeletingTrade(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete trade');
@@ -232,7 +343,7 @@ export default function Trades() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {mockTrades.length}
+                {trades.length}
               </div>
               <p className="text-xs text-gray-600 mt-1">
                 Registered trades
@@ -308,9 +419,25 @@ export default function Trades() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {mockTrades.map((trade) => (
-                <div key={trade.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin mr-2" />
+                <span>Loading trades...</span>
+              </div>
+            ) : trades.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500 mb-4">No trades found</p>
+                <Link href="/trades/register">
+                  <Button>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Register First Trade
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {currentTrades.map((trade) => (
+                <div key={trade?.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     {/* Trade Info */}
                     <div className="flex items-center space-x-4">
@@ -383,51 +510,50 @@ export default function Trades() {
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-
-            {/* Pagination */}
-            <div className="flex justify-center mt-6">
-              <div className="flex space-x-2">
-                <Button variant="outline" size="sm" disabled>
-                  Previous
-                </Button>
-                <Button variant="outline" size="sm" className="bg-blue-600 text-white">
-                  1
-                </Button>
-                <Button variant="outline" size="sm">
-                  2
-                </Button>
-                <Button variant="outline" size="sm">
-                  Next
-                </Button>
+                ))}
               </div>
-            </div>
+            )}
+
+            {/* Pagination - only show if there are multiple pages */}
+            {!loading && totalPages > 1 && (
+              <div className="flex justify-center mt-6">
+                <div className="flex space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={goToPrevious}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  
+                  {/* Page numbers */}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <Button
+                      key={page}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => goToPage(page)}
+                      className={currentPage === page ? "bg-blue-600 text-white" : ""}
+                    >
+                      {page}
+                    </Button>
+                  ))}
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={goToNext}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Empty State (when there are no trades) */}
-        {mockTrades.length === 0 && (
-          <Card className="text-center py-12">
-            <CardContent>
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="w-8 h-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                No trades found
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Register your first trade to start tracking your results.
-              </p>
-              <Link href="/trades/register">
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Register First Trade
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Edit Trade Dialog */}
         <Dialog open={!!editingTrade} onOpenChange={() => setEditingTrade(null)}>
@@ -446,7 +572,7 @@ export default function Trades() {
                   exitPrice: editingTrade.exitPrice.toString(),
                   quantity: editingTrade.quantity.toString(),
                   date: editingTrade.date,
-                  portfolioId: '1' // Mock portfolio ID - replace with actual logic
+                  portfolioId: editingTrade.portfolioId.toString()
                 }}
                 onSubmit={handleEditTrade}
                 isSubmitting={isEditing}
