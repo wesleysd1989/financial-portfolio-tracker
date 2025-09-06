@@ -1,8 +1,31 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/main-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import Link from 'next/link';
+import TradeForm from '../../../components/trade/trade-form';
 import { 
   Plus, 
   Search,
@@ -13,7 +36,9 @@ import {
   DollarSign,
   BarChart3,
   Edit,
-  Trash2
+  Trash2,
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 
 // Mock data for demonstration
@@ -81,9 +106,72 @@ const mockTrades = [
 ];
 
 export default function Trades() {
-  const totalPnL = mockTrades.reduce((sum, trade) => sum + trade.pnl, 0);
-  const profitableTrades = mockTrades.filter(trade => trade.pnl > 0).length;
-  const totalVolume = mockTrades.reduce((sum, trade) => sum + (trade.entryPrice * trade.quantity), 0);
+  const [trades, setTrades] = useState(mockTrades);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [editingTrade, setEditingTrade] = useState(null);
+  const [deletingTrade, setDeletingTrade] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const totalPnL = trades.reduce((sum, trade) => sum + trade.pnl, 0);
+  const profitableTrades = trades.filter(trade => trade.pnl > 0).length;
+  const totalVolume = trades.reduce((sum, trade) => sum + (trade.entryPrice * trade.quantity), 0);
+
+  const handleEditTrade = async (tradeData) => {
+    try {
+      setIsEditing(true);
+      setError('');
+      
+      // Simulate API call - replace with actual API call
+      const response = await fetch(`/api/trades/${editingTrade.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(tradeData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update trade');
+      }
+
+      const updatedTrade = await response.json();
+      
+      // Update local state
+      setTrades(trades.map(trade => 
+        trade.id === editingTrade.id ? { ...trade, ...updatedTrade } : trade
+      ));
+      
+      setEditingTrade(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update trade');
+    } finally {
+      setIsEditing(false);
+    }
+  };
+
+  const handleDeleteTrade = async (tradeId) => {
+    try {
+      setIsDeleting(true);
+      setError('');
+      
+      // Simulate API call - replace with actual API call
+      const response = await fetch(`/api/trades/${tradeId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete trade');
+      }
+
+      // Update local state
+      setTrades(trades.filter(trade => trade.id !== tradeId));
+      setDeletingTrade(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete trade');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <MainLayout>
@@ -96,11 +184,21 @@ export default function Trades() {
               Manage and track your buy and sell trades
             </p>
           </div>
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            New Trade
-          </Button>
+          <Link href="/trades/register">
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              New Trade
+            </Button>
+          </Link>
         </div>
+
+        {/* Error Display */}
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
 
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -261,11 +359,25 @@ export default function Trades() {
                         {trade.type}
                       </Badge>
                       <div className="flex space-x-2">
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setEditingTrade(trade)}
+                          disabled={isEditing || isDeleting}
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="outline" size="sm">
-                          <Trash2 className="w-4 h-4" />
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setDeletingTrade(trade)}
+                          disabled={isEditing || isDeleting}
+                        >
+                          {isDeleting && deletingTrade?.id === trade.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
                         </Button>
                       </div>
                     </div>
@@ -307,13 +419,75 @@ export default function Trades() {
               <p className="text-gray-600 mb-6">
                 Register your first trade to start tracking your results.
               </p>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Register First Trade
-              </Button>
+              <Link href="/trades/register">
+                <Button>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Register First Trade
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         )}
+
+        {/* Edit Trade Dialog */}
+        <Dialog open={!!editingTrade} onOpenChange={() => setEditingTrade(null)}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Trade</DialogTitle>
+              <DialogDescription>
+                Make changes to your trade here. Click save when you're done.
+              </DialogDescription>
+            </DialogHeader>
+            {editingTrade && (
+              <TradeForm
+                initialData={{
+                  ticker: editingTrade.ticker,
+                  entryPrice: editingTrade.entryPrice.toString(),
+                  exitPrice: editingTrade.exitPrice.toString(),
+                  quantity: editingTrade.quantity.toString(),
+                  date: editingTrade.date,
+                  portfolioId: '1' // Mock portfolio ID - replace with actual logic
+                }}
+                onSubmit={handleEditTrade}
+                isSubmitting={isEditing}
+                submitButtonText="Update Trade"
+              />
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Trade Dialog */}
+        <AlertDialog open={!!deletingTrade} onOpenChange={() => setDeletingTrade(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the trade for "{deletingTrade?.ticker}"
+                with P&L of ${deletingTrade?.pnl?.toFixed(2)}.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={() => deletingTrade && handleDeleteTrade(deletingTrade.id)}
+                disabled={isDeleting}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </>
+                )}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </MainLayout>
   );
