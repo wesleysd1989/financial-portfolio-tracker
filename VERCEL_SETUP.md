@@ -1,89 +1,95 @@
-# 🚀 Configuração para Deploy na Vercel
+# 🚀 Vercel Deployment Configuration
 
-## ✅ Correções Aplicadas
+## ✅ Applied Fixes
 
-### 1. **Scripts do package.json atualizados**
+### 1. **Updated package.json Scripts**
 
 - ✅ `"build": "prisma generate && next build --turbopack"`
 - ✅ `"postinstall": "prisma generate"`
 
-### 2. **Variáveis de Ambiente na Vercel**
+### 2. **Environment Variables in Vercel**
 
-Configure estas variáveis no dashboard da Vercel:
+Configure these variables in the Vercel dashboard:
 
-#### **DATABASE_URL** (obrigatória)
+#### **DATABASE_URL** (required)
 
 ```
 postgresql://postgres:YOUR_PASSWORD@db.YOUR_PROJECT_REF.supabase.co:5432/postgres?schema=public&pgbouncer=true&connection_limit=1&pool_timeout=20&connect_timeout=10
 ```
 
-**⚠️ IMPORTANTE:** 
-- Substitua `YOUR_PASSWORD` e `YOUR_PROJECT_REF` pelos valores reais do seu projeto Supabase
-- Para melhor performance, use **Supavisor Transaction Mode** (porta 6543):
+**⚠️ IMPORTANT:**
+
+- Replace `YOUR_PASSWORD` and `YOUR_PROJECT_REF` with your actual Supabase project values
+- For better performance, use **Supavisor Transaction Mode** (port 6543):
+
 ```
 postgresql://postgres.YOUR_PROJECT_REF:YOUR_PASSWORD@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1
 ```
 
-#### **NODE_ENV** (recomendada)
+#### **NODE_ENV** (recommended)
 
 ```
 production
 ```
 
-## 🔧 **Parâmetros Otimizados para Vercel**
+## 🔧 **Optimized Parameters for Vercel**
 
-- `pgbouncer=true` - Compatibilidade com Supavisor
-- `connection_limit=1` - Ideal para serverless
-- `pool_timeout=20` - Timeout otimizado para Vercel
+- `pgbouncer=true` - Supavisor compatibility
+- `connection_limit=1` - Ideal for serverless
+- `pool_timeout=20` - Optimized timeout for Vercel
 
-## 📝 **Passos para Deploy**
+## 📝 **Deployment Steps**
 
-1. ✅ Commit e push das mudanças no package.json
-2. ✅ Configurar DATABASE_URL na Vercel
-3. ✅ Fazer novo deploy
+1. ✅ Commit and push package.json changes
+2. ✅ Configure DATABASE_URL in Vercel
+3. ✅ Trigger new deployment
 
-## 🎯 **Por que estava falhando?**
+## 🎯 **Why was it failing?**
 
-- Vercel não executava `prisma generate` automaticamente
-- Cache de dependências causava cliente Prisma desatualizado
-- Connection string não otimizada para ambiente serverless
+- Vercel wasn't running `prisma generate` automatically
+- Dependency cache was causing outdated Prisma client
+- Connection string not optimized for serverless environment
 
-## 🔒 **Segurança**
+## 🔒 **Security**
 
-### **⚠️ NUNCA faça:**
+### **⚠️ NEVER do:**
 
-- ❌ Commit de credenciais no código
-- ❌ Hardcode de senhas nos arquivos
-- ❌ Compartilhamento de connection strings
+- ❌ Commit credentials in code
+- ❌ Hardcode passwords in files
+- ❌ Share connection strings
 
-### **✅ SEMPRE faça:**
+### **✅ ALWAYS do:**
 
-- ✅ Use variáveis de ambiente na Vercel
-- ✅ Configure DATABASE_URL no dashboard da Vercel
-- ✅ Mantenha credenciais apenas no .env local (não commitado)
+- ✅ Use environment variables in Vercel
+- ✅ Configure DATABASE_URL in Vercel dashboard
+- ✅ Keep credentials only in local .env (not committed)
 
 ## 🔧 **Troubleshooting Error 500**
 
-Se você receber erro 500 nas APIs, siga estes passos:
+If you receive 500 errors in APIs, follow these steps:
 
-### 1. **Testar Diagnóstico**
-Acesse: `https://seu-app.vercel.app/api/health`
+### 1. **Test Diagnostics**
 
-### 2. **Verificar Logs da Vercel**
+Access: `https://your-app.vercel.app/api/health`
+
+### 2. **Check Vercel Logs**
+
 - Dashboard → Functions → View Function Logs
-- Procure por erros de conexão com banco
+- Look for database connection errors
 
-### 3. **Verificar DATABASE_URL**
-- Certifique-se que está configurada na Vercel
-- Use os parâmetros otimizados acima
-- Teste com Supavisor Transaction Mode se disponível
+### 3. **Verify DATABASE_URL**
 
-### 4. **Soluções Comuns**
-- ✅ `pgbouncer=true` (obrigatório)
-- ✅ `connection_limit=1` (ideal para serverless)
-- ✅ `connect_timeout=10` (evita timeouts)
-- ✅ Use porta 6543 (Transaction Mode) quando possível
+- Make sure it's configured in Vercel
+- Use the optimized parameters above
+- Test with Supavisor Transaction Mode if available
 
-## ✨ **Resultado Esperado**
+### 4. **Common Solutions**
 
-Com essas correções, o build na Vercel deve funcionar perfeitamente!
+- ✅ `pgbouncer=true` (required)
+- ✅ `connection_limit=1` (ideal for serverless)
+- ✅ `connect_timeout=10` (prevents timeouts)
+- ✅ Use port 6543 (Transaction Mode) when possible
+
+## ✨ **Expected Result**
+
+With these fixes, the Vercel build should work perfectly!

@@ -5,18 +5,18 @@ export async function GET() {
   try {
     console.log('🔍 Health check started...');
     
-    // Check if DATABASE_URL is configured
-    const dbUrl = process.env.DATABASE_URL;
+    // Check if POSTGRES_URL is configured
+    const dbUrl = process.env.POSTGRES_URL;
     if (!dbUrl) {
-      console.error('❌ DATABASE_URL not configured');
+      console.error('❌ POSTGRES_URL not configured');
       return NextResponse.json({
         status: 'error',
-        message: 'DATABASE_URL not configured',
+        message: 'POSTGRES_URL not configured',
         timestamp: new Date().toISOString()
       }, { status: 500 });
     }
 
-    console.log('✅ DATABASE_URL is configured');
+    console.log('✅ POSTGRES_URL is configured');
     console.log('🔗 Connection string format:', dbUrl.substring(0, 30) + '...');
 
     // Test database connection
