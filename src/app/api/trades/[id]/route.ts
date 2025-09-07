@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { tradeService } from '../../../../../lib/db';
+import { tradeService } from '@/lib/db';
 import { calculatePnL } from '../../../../utils/pnl';
 
 // GET /api/trades/[id] - Get a specific trade

@@ -1,17 +1,10 @@
-const { PrismaClient } = require('../src/generated/prisma');
-
-// Instância global do Prisma Client
-const globalForPrisma = globalThis;
-const prisma = globalForPrisma.prisma ?? new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-});
-
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+import { prisma } from './prisma';
+import { Portfolio, Trade } from '@/generated/prisma';
 
 // Portfolio CRUD operations
-const portfolioService = {
+export const portfolioService = {
   // Create new portfolio
-  async create(data) {
+  async create(data: { name: string; initialValue: number }) {
     return await prisma.portfolio.create({
       data,
     });
@@ -30,7 +23,7 @@ const portfolioService = {
   },
 
   // Find portfolio by ID
-  async findById(id) {
+  async findById(id: number) {
     return await prisma.portfolio.findUnique({
       where: { id },
       include: {
@@ -44,7 +37,7 @@ const portfolioService = {
   },
 
   // Update portfolio
-  async update(id, data) {
+  async update(id: number, data: { name?: string; initialValue?: number }) {
     return await prisma.portfolio.update({
       where: { id },
       data,
@@ -52,7 +45,7 @@ const portfolioService = {
   },
 
   // Delete portfolio
-  async delete(id) {
+  async delete(id: number) {
     // First delete all related trades
     await prisma.trade.deleteMany({
       where: { portfolioId: id },
@@ -65,7 +58,7 @@ const portfolioService = {
   },
 
   // Calculate total portfolio PnL
-  async calculateTotalPnL(id) {
+  async calculateTotalPnL(id: number) {
     const trades = await prisma.trade.findMany({
       where: { portfolioId: id },
     });
@@ -78,9 +71,17 @@ const portfolioService = {
 };
 
 // Trade CRUD operations
-const tradeService = {
+export const tradeService = {
   // Create new trade
-  async create(data) {
+  async create(data: {
+    ticker: string;
+    entryPrice: number;
+    exitPrice: number;
+    quantity: number;
+    date: Date;
+    portfolioId: number;
+    pnl: number;
+  }) {
     return await prisma.trade.create({
       data,
       include: {
@@ -90,7 +91,7 @@ const tradeService = {
   },
 
   // Find all trades of a portfolio
-  async findByPortfolioId(portfolioId) {
+  async findByPortfolioId(portfolioId: number) {
     return await prisma.trade.findMany({
       where: { portfolioId },
       orderBy: {
@@ -103,7 +104,7 @@ const tradeService = {
   },
 
   // Find trade by ID
-  async findById(id) {
+  async findById(id: number) {
     return await prisma.trade.findUnique({
       where: { id },
       include: {
@@ -113,7 +114,18 @@ const tradeService = {
   },
 
   // Update trade
-  async update(id, data) {
+  async update(
+    id: number,
+    data: {
+      ticker?: string;
+      entryPrice?: number;
+      exitPrice?: number;
+      quantity?: number;
+      date?: Date;
+      portfolioId?: number;
+      pnl?: number;
+    }
+  ) {
     return await prisma.trade.update({
       where: { id },
       data,
@@ -124,19 +136,24 @@ const tradeService = {
   },
 
   // Delete trade
-  async delete(id) {
+  async delete(id: number) {
     return await prisma.trade.delete({
       where: { id },
     });
   },
 
   // Calculate PnL of a trade
-  calculatePnL(trade) {
+  calculatePnL(trade: Trade) {
     return (trade.exitPrice - trade.entryPrice) * trade.quantity;
   },
 
   // Find trades with filters
-  async findWithFilters(filters) {
+  async findWithFilters(filters: {
+    portfolioId?: number;
+    ticker?: string;
+    dateFrom?: Date;
+    dateTo?: Date;
+  }) {
     return await prisma.trade.findMany({
       where: {
         portfolioId: filters.portfolioId,
@@ -157,7 +174,7 @@ const tradeService = {
 };
 
 // Funções utilitárias gerais
-const dbUtils = {
+export const dbUtils = {
   // Verificar se o banco está conectado
   async healthCheck() {
     try {
@@ -174,9 +191,5 @@ const dbUtils = {
   },
 };
 
-module.exports = {
-  prisma,
-  portfolioService,
-  tradeService,
-  dbUtils,
-};
+// Exportar o cliente Prisma para uso direto quando necessário
+export { prisma };

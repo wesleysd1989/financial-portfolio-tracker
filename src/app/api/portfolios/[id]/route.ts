@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '../../../../../lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 // DELETE /api/portfolios/[id] - Delete a specific portfolio
 export async function DELETE(
