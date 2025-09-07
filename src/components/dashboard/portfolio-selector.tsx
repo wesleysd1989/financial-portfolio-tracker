@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertCircle, Briefcase } from 'lucide-react';
-import { Portfolio } from '../../types';
+import { Portfolio } from '@/types';
 
 interface PortfolioSelectorProps {
   onSelect: (portfolio: Portfolio | null) => void;

@@ -9,8 +9,8 @@ import {
   ApiResponse,
   DashboardStats,
   Optional
-} from '../types/index';
-import { VALIDATION_RULES, VALIDATION_MESSAGES } from '../types/validation';
+} from '../src/types/index';
+import { VALIDATION_RULES, VALIDATION_MESSAGES } from '../src/types/validation';
 
 // Type testing - this file won't be executed, only compiled to verify types
 

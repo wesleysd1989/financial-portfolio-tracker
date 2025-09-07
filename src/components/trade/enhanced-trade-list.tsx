@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Trade } from '../../../types/index';
+import { Trade } from '@/types/index';
 import { calculateTradePnL } from '@/utils/pnl';
 import TradeActions from './trade-actions';
 import MobileTradeCard from './mobile-trade-card';

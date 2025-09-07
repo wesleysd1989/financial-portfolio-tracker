@@ -16,11 +16,11 @@ import {
   AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
-import { Portfolio, Trade } from '../../../types/index';
-import PortfolioSelector from '../../../components/dashboard/portfolio-selector';
-import TradeList from '../../../components/dashboard/trade-list';
-import EnhancedTradeList from '../../components/trade/enhanced-trade-list';
-import PnLChart from '../../../components/charts/pnl-chart';
+import { Portfolio, Trade } from '@/types/index';
+import PortfolioSelector from '@/components/dashboard/portfolio-selector';
+import TradeList from '@/components/dashboard/trade-list';
+import EnhancedTradeList from '@/components/trade/enhanced-trade-list';
+import PnLChart from '@/components/charts/pnl-chart';
 import { calculateTotalPnL, calculatePortfolioPerformance, calculateCumulativePnL } from '@/utils/pnl';
 
 interface DashboardStats {

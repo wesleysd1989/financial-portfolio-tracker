@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Trade } from '../../../types/index';
+import { Trade } from '@/types/index';
 import TradeActions from './trade-actions';
 import { TrendingUp, TrendingDown, Calendar, DollarSign } from 'lucide-react';
 

@@ -8,7 +8,7 @@ import {
   formatPnL,
   formatPercentage
 } from './pnl';
-import { Trade, Portfolio } from '../../types';
+import { Trade, Portfolio } from '@/types';
 
 // Mock trade data for testing
 const mockTrades: Trade[] = [

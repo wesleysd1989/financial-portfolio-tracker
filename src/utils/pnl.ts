@@ -1,4 +1,4 @@
-import { Trade, PnLData, Portfolio } from '../../types';
+import { Trade, PnLData, Portfolio } from '@/types';
 
 /**
  * Calculate PnL for a single trade

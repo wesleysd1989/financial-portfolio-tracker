@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import MainLayout from '@/components/layout/main-layout';
-import TradeForm from '../../../../components/trade/trade-form';
+import TradeForm from '@/components/forms/trade-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, TrendingUp, Info, Plus } from 'lucide-react';

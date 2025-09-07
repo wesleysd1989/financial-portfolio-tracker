@@ -25,7 +25,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import Link from 'next/link';
-import TradeForm from '../../../components/trade/trade-form';
+import TradeForm from '@/components/forms/trade-form';
 import { 
   Plus, 
   Search,

@@ -1,4 +1,4 @@
-import Navigation from '@/components/navigation';
+import Navigation from '@/components/layout/navigation';
 import { cn } from '@/lib/utils';
 
 interface MainLayoutProps {
